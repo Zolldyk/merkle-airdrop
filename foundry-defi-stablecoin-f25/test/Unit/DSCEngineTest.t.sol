@@ -7,6 +7,13 @@ import {DecentralizedStableCoin} from "../../src/DecentralizedStableCoin.sol";
 import {DSCEngine} from "../../src/DSCEngine.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
+import {MockV3Aggregator} from "../Mocks/MockV3Aggregator.sol";
+import {MockMoreDebtDSC} from "../Mocks/MockMoreDebtDSC.sol";
+import {MockFailedMintDSC} from "../Mocks/MockFailedMintDSC.sol";
+import {MockFailedTransferFrom} from "../Mocks/MockFailedTransferFrom.sol";
+import {MockFailedTransfer} from "../Mocks/MockFailedTransfer.sol";
+import {Test, console} from "forge-std/Test.sol";
+import {StdCheats} from "forge-std/StdCheats.sol";
 
 contract DSCEngineTest is Test {
     DeployDSC deployer;
@@ -86,6 +93,11 @@ contract DSCEngineTest is Test {
         ERC20Mock(weth).approve(address(dsce), AMOUNT_COLLATERAL);
         dsce.depositCollateral(weth, AMOUNT_COLLATERAL);
         _;
+    }
+
+    function testCanDepositCollateralWithoutMinting() public depositedCollateral {
+        uint256 userBalance = dsc.balanceOf(USER);
+        assertEq(userBalance, 0);
     }
 
     function testDepositCollateralAndGetAccountInfo() public depositedCollateral {
